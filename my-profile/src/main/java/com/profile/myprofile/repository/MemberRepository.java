@@ -9,4 +9,5 @@ public interface MemberRepository {
     Member save(Member member);
     List<Member> findAll();
     Member findByName(String name);
+    Optional<Member> findByUserId(String userId);
 }

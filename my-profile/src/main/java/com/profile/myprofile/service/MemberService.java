@@ -6,11 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
 public class MemberService {
+    // ipAddress, userId
+    private Map<String, String> loggedInUserMap = new HashMap<>();
     private final MemberRepository memberRepository;
 
     @Autowired
@@ -35,5 +40,34 @@ public class MemberService {
         if (memberList.isEmpty())
             return null;
         return memberList;
+    }
+
+    public Member findByUserId(String userId) {
+        Optional<Member> memberOptional = memberRepository.findByUserId(userId);
+        return memberOptional.orElse(null);
+    }
+
+    // 로그인 설정
+    public void setLoggedInUser(String ipAddress, String userId) {
+        loggedInUserMap.put(ipAddress, userId);
+    }
+
+    public void setLoggedOutUser(String ipAddress, String userId) {
+        if (loggedInUserMap.containsKey(ipAddress)) {
+            if (loggedInUserMap.get(ipAddress).equals(userId)) {
+                loggedInUserMap.remove(ipAddress);
+            }
+        }
+    }
+
+    public boolean isLoggedIn(String ipAddress) {
+        if (loggedInUserMap.containsKey(ipAddress)) {
+            return true;
+        }
+        return false;
+    }
+
+    public String getLoggedInUserId(String ipAddress) {
+        return loggedInUserMap.get(ipAddress);
     }
 }
